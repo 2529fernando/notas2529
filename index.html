@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Notas - Diseño 2 Columnas</title>
+    <title>Mis Notas - Diseño Profesional</title>
     <style>
         /* --- ESTILOS GENERALES (Compatibles con iPad 2) --- */
         body, html {
             margin: 0; padding: 0; height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #ffffff; color: #333;
-            overflow: hidden; /* Evitamos scroll en el borde exterior */
+            overflow: hidden; /* Evita scrolls dobles en la pantalla exterior */
         }
 
-        /* --- MENSAJE FLOTANTE "CHECK" --- */
+        /* --- AVISO FLOTANTE "CHECK" --- */
         #notificacion {
             display: none; position: fixed; top: 15px; left: 50%;
             transform: translateX(-50%); -webkit-transform: translateX(-50%);
@@ -23,7 +23,7 @@
             font-size: 16px; font-weight: bold; z-index: 2000;
         }
 
-        /* --- ESTRUCTURA DE LA APP (2 Columnas exactas a tu captura) --- */
+        /* --- ESTRUCTURA PRINCIPAL (2 Columnas) --- */
         .app-wrapper {
             display: flex; display: -webkit-flex;
             height: 100%; width: 100%;
@@ -32,54 +32,32 @@
         /* --- COLUMNA 1: BARRA LATERAL GRIS --- */
         .sidebar {
             width: 250px; flex-shrink: 0; -webkit-flex-shrink: 0;
-            background-color: #eaebed; /* Gris claro de tu captura */
-            border-right: 1px solid #d1d1d6;
+            background-color: #eaebed; border-right: 1px solid #d1d1d6;
             display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
         }
-        .sidebar-header {
-            padding: 25px 20px;
-        }
-        .sidebar-title {
-            margin: 0; font-size: 22px; font-weight: bold; color: #000;
-        }
-        .sidebar-content {
-            flex-grow: 1; -webkit-flex-grow: 1;
-            overflow-y: auto;
-        }
-        .folder-item {
-            padding: 15px 20px; cursor: pointer; color: #333;
-            font-size: 17px; font-weight: 500;
-            transition: background 0.2s; -webkit-transition: background 0.2s;
-        }
-        .folder-item.active {
-            background-color: #009688; /* Tu color verde agua */
-            color: white;
-        }
-        .sidebar-footer {
-            padding: 20px; border-top: 1px solid #d1d1d6;
-        }
-        .btn-new-folder {
-            color: #009688; font-weight: 500; font-size: 16px; cursor: pointer;
-        }
+        .sidebar-header { padding: 25px 20px; }
+        .sidebar-title { margin: 0; font-size: 22px; font-weight: bold; color: #000; }
+        .sidebar-content { flex-grow: 1; -webkit-flex-grow: 1; overflow-y: auto; }
+        .folder-item { padding: 15px 20px; cursor: pointer; color: #333; font-size: 17px; font-weight: 500; }
+        .folder-item.active { background-color: #009688; color: white; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid #d1d1d6; }
+        .btn-new-folder { color: #009688; font-weight: 500; font-size: 16px; cursor: pointer; }
 
         /* --- COLUMNA 2: ÁREA DE EDICIÓN --- */
         .editor-zone {
-            flex-grow: 1; -webkit-flex-grow: 1;
-            background-color: white;
+            flex-grow: 1; -webkit-flex-grow: 1; background-color: white;
             display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
         }
         
-        /* HEADER DEL EDITOR (Título gigante a la izquierda, Botón a la derecha) */
+        /* Barra superior del editor */
         .editor-header {
-            padding: 15px 30px;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 30px; border-bottom: 1px solid #e0e0e0;
             display: flex; display: -webkit-flex; justify-content: space-between; align-items: center;
         }
         #cajaTitulo {
             border: none; outline: none; background: transparent;
-            font-size: 30px; font-weight: 700; color: #000; /* Mantiene la fuente grande */
-            flex-grow: 1; -webkit-flex-grow: 1;
-            margin-right: 20px; font-family: inherit;
+            font-size: 30px; font-weight: 700; color: #000; /* Fuente original grande y en negrita */
+            flex-grow: 1; -webkit-flex-grow: 1; margin-right: 20px; font-family: inherit;
         }
         #cajaTitulo::-webkit-input-placeholder { color: #c7c7cc; }
         
@@ -87,22 +65,34 @@
             padding: 10px 25px; border: none; border-radius: 20px;
             color: white; background-color: #009688;
             font-size: 16px; font-weight: 600; cursor: pointer;
-            transition: background 0.2s; white-space: nowrap;
+            white-space: nowrap; transition: background 0.2s;
         }
         .btn-save:hover { background-color: #00796B; }
 
-        /* CUERPO DEL EDITOR */
+        /* Contenido del papel de la nota */
         .editor-content {
-            flex-grow: 1; -webkit-flex-grow: 1;
-            padding: 30px; display: flex; display: -webkit-flex; flex-direction: column;
+            flex-grow: 1; -webkit-flex-grow: 1; padding: 30px;
+            display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
+            overflow-y: auto;
         }
         #cajaContenido {
             width: 100%; flex-grow: 1; -webkit-flex-grow: 1;
             border: none; outline: none; resize: none;
-            font-size: 19px; line-height: 1.6; color: #333;
-            font-family: inherit;
+            font-size: 19px; line-height: 1.6; color: #333; font-family: inherit;
         }
         #cajaContenido::-webkit-input-placeholder { color: #d1d1d6; }
+
+        /* --- COMPONENTES DE LA IMAGEN ADJUNTA --- */
+        .btn-adjuntar {
+            background-color: #f2f2f7; color: #009688; padding: 10px 15px;
+            border-radius: 8px; cursor: pointer; font-weight: bold;
+            font-size: 15px; display: inline-block; margin-bottom: 15px;
+            border: 1px dashed #009688; text-align: center; width: 160px;
+        }
+        #previewImagen {
+            max-width: 100%; max-height: 250px; margin-bottom: 20px;
+            border-radius: 8px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
@@ -116,7 +106,7 @@
             </div>
             <nav class="sidebar-content">
                 <div class="folder-item active">Todo (Web)</div>
-                </nav>
+            </nav>
             <div class="sidebar-footer">
                 <div class="btn-new-folder">+ Nueva Carpeta</div>
             </div>
@@ -129,6 +119,11 @@
             </header>
             
             <article class="editor-content">
+                <label for="inputImagen" class="btn-adjuntar">📷 Adjuntar Foto</label>
+                <input type="file" id="inputImagen" accept="image/*" style="display: none;">
+                
+                <img id="previewImagen" src="" alt="Foto adjunta">
+
                 <textarea id="cajaContenido" placeholder="Comienza a escribir tu nota aquí..."></textarea>
             </article>
         </main>
@@ -138,7 +133,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Configuración real de Firebase
+        // Tu configuración real e idéntica de Firebase
         var firebaseConfig = {
           apiKey: "AIzaSyDyuqn1K4k6oChD-WpvWCdxGq8N2P9h78Q",
           authDomain: "misnotas2529-83990.firebaseapp.com",
@@ -149,48 +144,102 @@
           appId: "1:457391422873:web:5a1651bcc8cbb6c8f1a708"
         };
 
+        // Inicializar Firebase Database
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
 
+        // Enlaces a los componentes visuales
         var cajaTitulo = document.getElementById('cajaTitulo');
         var cajaContenido = document.getElementById('cajaContenido');
         var notificacion = document.getElementById('notificacion');
+        var inputImagen = document.getElementById('inputImagen');
+        var previewImagen = document.getElementById('previewImagen');
+        
+        var urlImagenGlobal = ""; // Almacena el enlace de la imagen activa en la nube
 
+        // Descargar la nota al abrir la web
         cargarNota();
 
-        // FUNCIONES COMPATIBLES CON IPAD 2 (ES5)
         function cargarNota() {
-            cajaTitulo.value = "Cargando...";
-            cajaContenido.value = "Cargando...";
-
             database.ref('notas_compartidas/unica').on('value', function(snapshot) {
                 if (snapshot.exists()) {
                     var datos = snapshot.val();
                     cajaTitulo.value = datos.titulo || "";
                     cajaContenido.value = datos.contenido || "";
-                } else {
-                    cajaTitulo.value = "";
-                    cajaContenido.value = "";
+                    urlImagenGlobal = datos.imagenUrl || "";
+                    
+                    // Si hay una foto guardada, la cargamos y la mostramos
+                    if (urlImagenGlobal !== "") {
+                        previewImagen.src = urlImagenGlobal;
+                        previewImagen.style.display = "block";
+                    } else {
+                        previewImagen.src = "";
+                        previewImagen.style.display = "none";
+                    }
                 }
+            });
+        }
+
+        /* ESCUCHA DE IMAGEN: Envía el archivo directamente a tu cPanel vía AJAX (ES5) */
+        inputImagen.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+
+            var label = document.querySelector('.btn-adjuntar');
+            label.innerText = "⏳ Subiendo...";
+
+            // Empaquetamos la imagen para transmitirla
+            var formData = new FormData();
+            formData.append("imagen", file);
+
+            // Creamos una solicitud HTTP clásica compatible con Safari antiguo del iPad 2
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://sebastech.website/subir_imagen.php", true);
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        var respuesta = JSON.parse(xhr.responseText);
+                        if (respuesta.exito) {
+                            urlImagenGlobal = respuesta.url; // Guardamos la dirección de tu hosting
+                            previewImagen.src = respuesta.url;
+                            previewImagen.style.display = "block";
+                            label.innerText = "📷 Cambiar Foto";
+                        } else {
+                            alert("Error del servidor: " + respuesta.error);
+                            label.innerText = "📷 Adjuntar Foto";
+                        }
+                    } catch (err) {
+                        alert("Error al procesar la respuesta del servidor.");
+                        label.innerText = "📷 Adjuntar Foto";
+                    }
+                } else {
+                    alert("Error al conectar con cPanel.");
+                    label.innerText = "📷 Adjuntar Foto";
+                }
+            };
+            
+            xhr.send(formData); // Enviamos el archivo al PHP receptor de cPanel
+        });
+
+        function guardarNota() {
+            // Guardamos todo el paquete unido en Firebase Realtime Database
+            database.ref('notas_compartidas/unica').set({
+                titulo: cajaTitulo.value,
+                contenido: cajaContenido.value,
+                imagenUrl: urlImagenGlobal
+            }).then(function() {
+                mostrarCheck(); // Despliega el aviso flotante estilizado
+            }).catch(function(error) {
+                alert("Error al guardar: " + error);
             });
         }
 
         function mostrarCheck() {
             notificacion.style.display = "block";
-            setTimeout(function() {
-                notificacion.style.display = "none";
+            setTimeout(function() { 
+                notificacion.style.display = "none"; 
             }, 2000); 
-        }
-
-        function guardarNota() {
-            database.ref('notas_compartidas/unica').set({
-                titulo: cajaTitulo.value,
-                contenido: cajaContenido.value
-            }).then(function() {
-                mostrarCheck();
-            }).catch(function(error) {
-                alert("Hubo un error al guardar: " + error);
-            });
         }
     </script>
 </body>
