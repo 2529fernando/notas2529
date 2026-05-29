@@ -26,8 +26,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Tu configuración real de Firebase
-        const firebaseConfig = {
+        // Configuración de Firebase
+        var firebaseConfig = {
           apiKey: "AIzaSyDyuqn1K4k6oChD-WpvWCdxGq8N2P9h78Q",
           authDomain: "misnotas2529-83990.firebaseapp.com",
           databaseURL: "https://misnotas2529-83990-default-rtdb.firebaseio.com",
@@ -39,22 +39,21 @@
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        var database = firebase.database();
 
-        const cajaTitulo = document.getElementById('cajaTitulo');
-        const cajaContenido = document.getElementById('cajaContenido');
+        var cajaTitulo = document.getElementById('cajaTitulo');
+        var cajaContenido = document.getElementById('cajaContenido');
 
-        // Esta línea hace que la nota cargue inmediatamente al abrir la página
         cargarNota();
 
+        // FUNCIONES TRADUCIDAS A ES5 (Compatible con iPad 2)
         function cargarNota() {
             cajaTitulo.value = "Cargando...";
             cajaContenido.value = "Cargando...";
 
-            // Leer desde la rama "notas_compartidas"
-            database.ref('notas_compartidas/unica').on('value', (snapshot) => {
+            database.ref('notas_compartidas/unica').on('value', function(snapshot) {
                 if (snapshot.exists()) {
-                    const datos = snapshot.val();
+                    var datos = snapshot.val();
                     cajaTitulo.value = datos.titulo || "";
                     cajaContenido.value = datos.contenido || "";
                 } else {
@@ -68,9 +67,9 @@
             database.ref('notas_compartidas/unica').set({
                 titulo: cajaTitulo.value,
                 contenido: cajaContenido.value
-            }).then(() => {
+            }).then(function() {
                 alert("¡Datos actualizados correctamente! 📱↔️💻");
-            }).catch((error) => {
+            }).catch(function(error) {
                 alert("Hubo un error al guardar: " + error);
             });
         }
