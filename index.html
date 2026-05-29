@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mis Notas y Archivos Cloud</title>
     <style>
-        /* Evita problemas de desbordamiento en pantallas de tablets */
+        /* --- TRUCO CLAVE: Evita que los elementos se salgan de la pantalla --- */
         * { box-sizing: border-box; }
 
         body, html {
@@ -20,18 +20,29 @@
             background-color: #009688; color: white;
             padding: 12px 25px; border-radius: 25px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 16px; font-weight: bold; z-index: 2000;
+            font-size: 16px; font-weight: bold; z-index: 4000;
         }
+
+        /* Capa oscura que aparece en el celular al abrir el menú */
+        #overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            z-index: 2500;
+        }
+        #overlay.active { display: block; }
 
         .app-wrapper {
             display: flex; display: -webkit-flex;
-            height: 100%; width: 100%;
+            height: 100%; width: 100%; position: relative;
         }
 
+        /* --- BARRA LATERAL --- */
         .sidebar {
             width: 260px; flex-shrink: 0; -webkit-flex-shrink: 0;
             background-color: #eaebed; border-right: 1px solid #d1d1d6;
             display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
+            z-index: 3000; height: 100%;
+            transition: left 0.3s ease; -webkit-transition: left 0.3s ease;
         }
         .sidebar-header { padding: 25px 20px; }
         .sidebar-title { margin: 0; font-size: 22px; font-weight: bold; color: #000; }
@@ -50,46 +61,32 @@
             color: #8e8e93; font-weight: bold; text-transform: uppercase;
         }
 
+        /* --- ÁREA DE EDICIÓN --- */
         .editor-zone {
             flex-grow: 1; -webkit-flex-grow: 1; background-color: white;
             display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
             width: calc(100% - 260px); 
         }
         
-        /* Cabecera del editor configurada para contener los botones */
         .editor-header {
             padding: 15px 40px 15px 30px; 
             border-bottom: 1px solid #e0e0e0;
             display: flex; display: -webkit-flex; justify-content: space-between; align-items: center;
         }
+        
+        .btn-menu {
+            display: none; /* Oculto en PC y iPad */
+            background: none; border: none; font-size: 28px;
+            color: #009688; cursor: pointer; padding: 0; margin-right: 15px;
+        }
+
         #cajaTitulo {
             border: none; outline: none; background: transparent;
             font-size: 30px; font-weight: 700; color: #000;
             flex-grow: 1; -webkit-flex-grow: 1; 
-            margin-right: 20px; font-family: inherit;
-            min-width: 0; 
+            margin-right: 20px; font-family: inherit; min-width: 0; 
         }
         
-        /* Contenedor alineado para mantener los dos botones en fila */
-        .header-buttons {
-            display: flex; display: -webkit-flex;
-            align-items: center;
-            flex-shrink: 0; -webkit-flex-shrink: 0;
-        }
-
-        /* BOTÓN DE SUBIR (Ahora arriba y de color Naranja) */
-        .btn-subir-archivo {
-            background-color: #ff5722; color: white; 
-            padding: 10px 22px; border-radius: 20px; 
-            cursor: pointer; font-weight: 600; font-size: 16px;
-            white-space: nowrap; display: inline-block; text-align: center;
-            margin-right: 12px; /* Separación con el botón de guardar */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: background 0.2s; -webkit-transition: background 0.2s;
-        }
-        .btn-subir-archivo:hover { background-color: #e64a19; }
-
-        /* BOTÓN DE GUARDAR (Mantiene su color verde agua original) */
         .btn-save {
             padding: 10px 25px; border: none; border-radius: 20px;
             color: white; background-color: #009688;
@@ -108,19 +105,48 @@
             border: none; outline: none; resize: none;
             font-size: 19px; line-height: 1.6; color: #333; font-family: inherit;
         }
+
+        .btn-subir-archivo {
+            background-color: #009688; color: white; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 15px;
+            display: inline-block; margin-bottom: 20px; text-align: center; width: 170px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: background 0.2s;
+        }
+        .btn-subir-archivo:hover { background-color: #00796B; }
+
+        /* --- DISEÑO MÓVIL (Se activa solo en pantallas pequeñas) --- */
+        @media (max-width: 768px) {
+            .btn-menu { display: block; }
+            .editor-zone { width: 100%; }
+            .editor-header { padding: 15px 20px; }
+            #cajaTitulo { font-size: 22px; }
+            .btn-save { padding: 10px 15px; font-size: 14px; }
+            .editor-content { padding: 20px; }
+            
+            /* El menú lateral se esconde hacia la izquierda */
+            .sidebar {
+                position: absolute;
+                left: -260px;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            }
+            /* Y aparece cuando le ponemos la clase .open */
+            .sidebar.open { left: 0; }
+        }
     </style>
 </head>
 <body>
 
     <div id="notificacion">✅ ¡Guardado!</div>
+    
+    <div id="overlay"></div>
 
     <div class="app-wrapper">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1 class="sidebar-title">Mis Notas</h1>
             </div>
             <nav class="sidebar-content">
-                <div class="folder-item active">📝 Todo (Web)</div>
+                <div class="folder-item active" onclick="cerrarMenu()">📝 Todo (Web)</div>
                 
                 <div class="sidebar-section-title">Archivos Subidos</div>
                 <div id="listaArchivos"></div>
@@ -129,17 +155,15 @@
 
         <main class="editor-zone">
             <header class="editor-header">
+                <button id="btnMenu" class="btn-menu">☰</button>
                 <input type="text" id="cajaTitulo" placeholder="Título de la nota">
-                
-                <div class="header-buttons">
-                    <label for="inputArchivo" class="btn-subir-archivo">📎 Subir</label>
-                    <input type="file" id="inputArchivo" style="display: none;">
-                    
-                    <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
-                </div>
+                <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
             </header>
             
             <article class="editor-content">
+                <label for="inputArchivo" class="btn-subir-archivo">📎 Adjuntar Archivo</label>
+                <input type="file" id="inputArchivo" style="display: none;">
+                
                 <textarea id="cajaContenido" placeholder="Comienza a escribir tu nota aquí..."></textarea>
             </article>
         </main>
@@ -167,6 +191,24 @@
         var notificacion = document.getElementById('notificacion');
         var inputArchivo = document.getElementById('inputArchivo');
         var listaArchivos = document.getElementById('listaArchivos');
+        
+        // Elementos del menú móvil
+        var btnMenu = document.getElementById('btnMenu');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('overlay');
+
+        // Lógica para abrir y cerrar el menú en celulares
+        btnMenu.onclick = function() {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        };
+
+        function cerrarMenu() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+        
+        overlay.onclick = cerrarMenu;
 
         // 1. Cargar el texto de la nota principal
         database.ref('notas_compartidas/unica').on('value', function(snapshot) {
@@ -190,6 +232,7 @@
                     
                     divElement.onclick = function() {
                         window.open(archivo.url, '_blank');
+                        cerrarMenu(); // Cerramos el menú al tocar un archivo en celular
                     };
                     
                     listaArchivos.appendChild(divElement);
@@ -205,9 +248,8 @@
             if (!file) return;
 
             var boton = document.querySelector('.btn-subir-archivo');
-            var textoOriginal = boton.innerText;
-            boton.innerText = "⏳ ...";
-            boton.style.backgroundColor = "#e64a19"; // Cambia a naranja oscuro al procesar
+            boton.innerText = "⏳ Subiendo...";
+            boton.style.backgroundColor = "#00796B";
 
             var formData = new FormData();
             formData.append("archivo", file); 
@@ -216,9 +258,8 @@
             xhr.open("POST", "https://sebastech.website/subir_archivo.php", true);
             
             xhr.onload = function() {
-                // Restauramos el botón naranja original
-                boton.innerText = textoOriginal;
-                boton.style.backgroundColor = "#ff5722";
+                boton.innerText = "📎 Adjuntar Archivo";
+                boton.style.backgroundColor = "#009688";
 
                 if (xhr.status === 200) {
                     try {
