@@ -3,156 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Notas</title>
+    <title>Mis Notas - Diseño 2 Columnas</title>
     <style>
-        /* --- ESTILOS GENERALES --- */
+        /* --- ESTILOS GENERALES (Compatibles con iPad 2) --- */
         body, html {
-            margin: 0; 
-            padding: 0; 
-            height: 100%;
-            font-family: Arial, Helvetica, sans-serif;
-            overflow: hidden; /* Evita que la pantalla entera se mueva */
+            margin: 0; padding: 0; height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff; color: #333;
+            overflow: hidden; /* Evitamos scroll en el borde exterior */
         }
 
-        /* --- AVISO FLOTANTE DE GUARDADO (CHECK) --- */
+        /* --- MENSAJE FLOTANTE "CHECK" --- */
         #notificacion {
-            display: none; 
-            position: fixed; 
-            top: 20px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            -webkit-transform: translateX(-50%); /* iPad 2 */
-            background-color: #4CAF50; 
-            color: white;
-            padding: 15px 30px; 
-            border-radius: 30px;
+            display: none; position: fixed; top: 15px; left: 50%;
+            transform: translateX(-50%); -webkit-transform: translateX(-50%);
+            background-color: #009688; color: white;
+            padding: 12px 25px; border-radius: 25px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 18px; 
-            font-weight: bold; 
-            z-index: 1000;
+            font-size: 16px; font-weight: bold; z-index: 2000;
         }
 
-        /* --- ESTRUCTURA PRINCIPAL (2 COLUMNAS) --- */
-        .app-container {
-            display: flex; 
-            display: -webkit-flex; /* iPad 2 */
-            height: 100%;
-            width: 100%;
+        /* --- ESTRUCTURA DE LA APP (2 Columnas exactas a tu captura) --- */
+        .app-wrapper {
+            display: flex; display: -webkit-flex;
+            height: 100%; width: 100%;
         }
 
-        /* --- BARRA LATERAL IZQUIERDA --- */
+        /* --- COLUMNA 1: BARRA LATERAL GRIS --- */
         .sidebar {
-            width: 250px; 
-            background-color: #eaebec; /* Color gris claro de tu imagen */
+            width: 250px; flex-shrink: 0; -webkit-flex-shrink: 0;
+            background-color: #eaebed; /* Gris claro de tu captura */
             border-right: 1px solid #d1d1d6;
-            display: flex; 
-            display: -webkit-flex; 
-            flex-direction: column; 
-            -webkit-flex-direction: column;
-            flex-shrink: 0;
+            display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
         }
         .sidebar-header {
             padding: 25px 20px;
-            font-size: 22px; 
-            font-weight: bold; 
-            color: #000;
         }
-        .sidebar-menu {
-            flex-grow: 1; 
-            -webkit-flex-grow: 1;
+        .sidebar-title {
+            margin: 0; font-size: 22px; font-weight: bold; color: #000;
         }
-        .menu-item {
-            padding: 15px 20px;
-            font-size: 16px;
-            cursor: pointer;
+        .sidebar-content {
+            flex-grow: 1; -webkit-flex-grow: 1;
+            overflow-y: auto;
         }
-        .menu-item.active {
-            background-color: #009688; /* Verde agua */
+        .folder-item {
+            padding: 15px 20px; cursor: pointer; color: #333;
+            font-size: 17px; font-weight: 500;
+            transition: background 0.2s; -webkit-transition: background 0.2s;
+        }
+        .folder-item.active {
+            background-color: #009688; /* Tu color verde agua */
             color: white;
-            font-weight: bold;
         }
         .sidebar-footer {
-            padding: 20px;
-            color: #009688;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
+            padding: 20px; border-top: 1px solid #d1d1d6;
+        }
+        .btn-new-folder {
+            color: #009688; font-weight: 500; font-size: 16px; cursor: pointer;
         }
 
-        /* --- ÁREA PRINCIPAL (DERECHA) --- */
-        .main-content {
-            flex-grow: 1; 
-            -webkit-flex-grow: 1;
+        /* --- COLUMNA 2: ÁREA DE EDICIÓN --- */
+        .editor-zone {
+            flex-grow: 1; -webkit-flex-grow: 1;
             background-color: white;
-            display: flex; 
-            display: -webkit-flex; 
-            flex-direction: column; 
-            -webkit-flex-direction: column;
+            display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
         }
         
-        /* Barra superior */
-        .top-bar {
+        /* HEADER DEL EDITOR (Título gigante a la izquierda, Botón a la derecha) */
+        .editor-header {
             padding: 15px 30px;
-            border-bottom: 1px solid #eaebec;
-            display: flex; 
-            display: -webkit-flex; 
-            justify-content: space-between; 
-            -webkit-justify-content: space-between;
-            align-items: center; 
-            -webkit-align-items: center;
-        }
-        .sync-status {
-            color: #8e8e93;
-            font-size: 16px;
-        }
-        .btn-guardar {
-            background-color: #009688; 
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-guardar:hover {
-            background-color: #00796b;
-        }
-
-        /* Zona de escritura */
-        .editor-area {
-            padding: 30px 40px;
-            flex-grow: 1; 
-            -webkit-flex-grow: 1;
-            display: flex; 
-            display: -webkit-flex; 
-            flex-direction: column; 
-            -webkit-flex-direction: column;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex; display: -webkit-flex; justify-content: space-between; align-items: center;
         }
         #cajaTitulo {
-            width: 100%;
-            border: none;
-            outline: none;
-            font-size: 32px;
-            font-weight: bold;
-            color: #000;
-            margin-bottom: 20px;
-            background: transparent;
+            border: none; outline: none; background: transparent;
+            font-size: 30px; font-weight: 700; color: #000; /* Mantiene la fuente grande */
+            flex-grow: 1; -webkit-flex-grow: 1;
+            margin-right: 20px; font-family: inherit;
         }
-        #cajaTitulo::-webkit-input-placeholder { color: #ccc; }
+        #cajaTitulo::-webkit-input-placeholder { color: #c7c7cc; }
+        
+        .btn-save {
+            padding: 10px 25px; border: none; border-radius: 20px;
+            color: white; background-color: #009688;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s; white-space: nowrap;
+        }
+        .btn-save:hover { background-color: #00796B; }
 
+        /* CUERPO DEL EDITOR */
+        .editor-content {
+            flex-grow: 1; -webkit-flex-grow: 1;
+            padding: 30px; display: flex; display: -webkit-flex; flex-direction: column;
+        }
         #cajaContenido {
-            width: 100%;
-            flex-grow: 1; 
-            -webkit-flex-grow: 1;
-            border: none;
-            outline: none;
-            resize: none;
-            font-size: 18px;
-            line-height: 1.6;
-            color: #333;
-            font-family: Arial, Helvetica, sans-serif;
-            background: transparent;
+            width: 100%; flex-grow: 1; -webkit-flex-grow: 1;
+            border: none; outline: none; resize: none;
+            font-size: 19px; line-height: 1.6; color: #333;
+            font-family: inherit;
         }
         #cajaContenido::-webkit-input-placeholder { color: #d1d1d6; }
     </style>
@@ -161,35 +109,36 @@
 
     <div id="notificacion">✅ ¡Guardado!</div>
 
-    <div class="app-container">
-        
+    <div class="app-wrapper">
         <aside class="sidebar">
-            <div class="sidebar-header">Mis Notas</div>
-            <div class="sidebar-menu">
-                <div class="menu-item active">Todo (Web)</div>
-                </div>
-            <div class="sidebar-footer">+ Nueva Carpeta</div>
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">Mis Notas</h1>
+            </div>
+            <nav class="sidebar-content">
+                <div class="folder-item active">Todo (Web)</div>
+                </nav>
+            <div class="sidebar-footer">
+                <div class="btn-new-folder">+ Nueva Carpeta</div>
+            </div>
         </aside>
 
-        <main class="main-content">
-            <header class="top-bar">
-                <div class="sync-status">Sincronizado</div>
-                <button class="btn-guardar" onclick="guardarNota()">💾 Guardar</button>
+        <main class="editor-zone">
+            <header class="editor-header">
+                <input type="text" id="cajaTitulo" placeholder="Título de la nota">
+                <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
             </header>
             
-            <section class="editor-area">
-                <input type="text" id="cajaTitulo" placeholder="Título de la nota">
+            <article class="editor-content">
                 <textarea id="cajaContenido" placeholder="Comienza a escribir tu nota aquí..."></textarea>
-            </section>
+            </article>
         </main>
-
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Tus credenciales de Firebase
+        // Configuración real de Firebase
         var firebaseConfig = {
           apiKey: "AIzaSyDyuqn1K4k6oChD-WpvWCdxGq8N2P9h78Q",
           authDomain: "misnotas2529-83990.firebaseapp.com",
@@ -200,20 +149,16 @@
           appId: "1:457391422873:web:5a1651bcc8cbb6c8f1a708"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
 
-        // Conectar con la interfaz
         var cajaTitulo = document.getElementById('cajaTitulo');
         var cajaContenido = document.getElementById('cajaContenido');
         var notificacion = document.getElementById('notificacion');
 
-        // Cargar nota al entrar a la página
         cargarNota();
 
-        // --- FUNCIONES (ES5 para que funcione en iPad 2) ---
-
+        // FUNCIONES COMPATIBLES CON IPAD 2 (ES5)
         function cargarNota() {
             cajaTitulo.value = "Cargando...";
             cajaContenido.value = "Cargando...";
@@ -232,7 +177,6 @@
 
         function mostrarCheck() {
             notificacion.style.display = "block";
-            // Desaparece solito después de 2 segundos (2000 ms)
             setTimeout(function() {
                 notificacion.style.display = "none";
             }, 2000); 
@@ -245,7 +189,7 @@
             }).then(function() {
                 mostrarCheck();
             }).catch(function(error) {
-                alert("Error de conexión: " + error);
+                alert("Hubo un error al guardar: " + error);
             });
         }
     </script>
