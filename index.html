@@ -3,72 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espacio Compartido</title>
+    <title>Mis Notas - Diseño Moderno</title>
     <style>
-        /* Aumentamos el tamaño de fuente general */
-        body { 
-            font-family: Arial, sans-serif; 
-            background-color: #E0F7FA; 
-            padding: 20px; 
-            text-align: center; 
-            font-size: 18px; 
-        }
-        .container { 
-            max-width: 600px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 25px; 
-            border-radius: 12px; 
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.1); 
-        }
-        /* Letra más grande y más espacio para los campos de texto */
-        input[type="text"], textarea { 
-            width: 100%; 
-            box-sizing: border-box; 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            font-size: 20px; /* Letra más grande aquí */
-        }
-        textarea { 
-            height: 400px; 
-            resize: vertical; 
-            font-family: inherit; 
-            line-height: 1.5; /* Más espacio entre líneas para leer mejor */
-        }
-        /* Botón más grande y fácil de tocar */
-        button { 
-            padding: 15px 20px; 
-            border: none; 
-            border-radius: 8px; 
-            color: white; 
-            cursor: pointer; 
-            font-weight: bold; 
-            width: 100%; 
-            background-color: #009688; 
-            font-size: 20px;
-        }
-        button:hover { 
-            background-color: #00796B; 
+        /* --- ESTILOS GENERALES (Compatibles con iPad 2) --- */
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f7; color: #333;
+            overflow: hidden; /* Evitamos scroll en el body principal */
+            font-size: 16px;
         }
 
-        /* DISEÑO DEL AVISO FLOTANTE (CHECK) */
+        /* --- MENSAJE FLOTANTE "CHECK" --- */
         #notificacion {
-            display: none; /* Oculto por defecto */
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            -webkit-transform: translateX(-50%); /* Para que funcione en el iPad 2 */
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 30px;
+            display: none; position: fixed; top: 15px; left: 50%;
+            transform: translateX(-50%); -webkit-transform: translateX(-50%);
+            background-color: #4CAF50; color: white;
+            padding: 12px 25px; border-radius: 25px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 18px;
-            font-weight: bold;
-            z-index: 1000;
+            font-size: 16px; font-weight: bold; z-index: 2000;
+        }
+
+        /* --- ESTRUCTURA DE LA APP (3 Columnas) --- */
+        .app-wrapper {
+            display: flex; display: -webkit-flex; /* Flexbox para iPad 2 */
+            height: 100%;
+            width: 100%;
+        }
+
+        /* --- COLUMNA 1: CARPETAS (BARRA LATERAL) --- */
+        .sidebar {
+            width: 250px; flex-shrink: 0; -webkit-flex-shrink: 0;
+            background-color: rgba(230, 230, 235, 0.9);
+            border-right: 1px solid #d1d1d6;
+            display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #d1d1d6;
+        }
+        .sidebar-title {
+            margin: 0; font-size: 24px; font-weight: bold; color: #000;
+        }
+        .sidebar-content {
+            flex-grow: 1; -webkit-flex-grow: 1;
+            overflow-y: auto; /* Scroll independiente */
+            padding-bottom: 60px; /* Espacio para el botón de abajo */
+        }
+        .folder-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            color: #1c1c1e;
+            font-size: 17px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: background 0.2s; -webkit-transition: background 0.2s;
+        }
+        .folder-item:hover { background-color: rgba(0,0,0,0.05); }
+        .folder-item.active {
+            background-color: #009688; /* Tu color principal */
+            color: white; font-weight: 500;
+        }
+        .sidebar-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #d1d1d6;
+            background-color: rgba(230, 230, 235, 0.9);
+        }
+        .btn-new-folder {
+            color: #009688; font-weight: 500; text-decoration: none; font-size: 17px; cursor: pointer;
+        }
+
+        /* --- COLUMNA 2: LISTA DE NOTAS --- */
+        .note-list {
+            width: 320px; flex-shrink: 0; -webkit-flex-shrink: 0;
+            background-color: white;
+            border-right: 1px solid #d1d1d6;
+            display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
+            overflow: hidden;
+        }
+        .note-list-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #d1d1d6;
+            display: flex; display: -webkit-flex; justify-content: space-between; align-items: center;
+        }
+        .note-list-title { margin: 0; font-size: 19px; font-weight: 600; color: #000; }
+        .note-list-content {
+            flex-grow: 1; -webkit-flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        .note-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #e5e5ea;
+            transition: background 0.2s;
+        }
+        .note-item:hover { background-color: #f2f2f7; }
+        .note-item.active { background-color: rgba(0,150,136, 0.1); } /* Color transparente */
+        
+        .note-item-title { font-weight: 600; font-size: 17px; margin: 0 0 5px 0; color: #1c1c1e; }
+        .note-item-snippet { font-size: 15px; color: #8e8e93; margin: 0; line-height: 1.3; }
+
+        /* --- COLUMNA 3: EDITOR DE NOTAS --- */
+        .editor-zone {
+            flex-grow: 1; -webkit-flex-grow: 1;
+            background-color: white;
+            display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
+            overflow: hidden;
+        }
+        .editor-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid #d1d1d6;
+            display: flex; display: -webkit-flex; justify-content: space-between; align-items: center;
+        }
+        .btn-save {
+            padding: 10px 25px; border: none; border-radius: 20px;
+            color: white; background-color: #009688; /* Tu color principal */
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-save:hover { background-color: #00796B; }
+
+        .editor-content {
+            flex-grow: 1; -webkit-flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex; display: -webkit-flex; flex-direction: column;
+        }
+        #cajaTitulo {
+            width: 100%; border: none; outline: none;
+            font-size: 30px; font-weight: 700; color: #000;
+            padding: 0; margin-bottom: 15px;
+        }
+        #cajaTitulo::-webkit-input-placeholder { color: #c7c7cc; }
+        
+        #cajaContenido {
+            width: 100%; flex-grow: 1; -webkit-flex-grow: 1;
+            border: none; outline: none; resize: none;
+            font-size: 19px; line-height: 1.6; color: #333;
+            padding: 0;
+            font-family: inherit;
+        }
+        #cajaContenido::-webkit-input-placeholder { color: #d1d1d6; }
+
+        /* --- RESPONSIVE (Celulares) --- */
+        @media (max-width: 768px) {
+            .sidebar, .note-list { display: none; } /* Ocultamos por defecto en celular */
+            /* Aquí faltaría la lógica de JS para mostrar/ocultar con menú */
         }
     </style>
 </head>
@@ -76,18 +157,60 @@
 
     <div id="notificacion">✅ ¡Guardado!</div>
 
-    <div id="app-content" class="container">
-        <h2 style="color: #00796B;">Nota Compartida</h2>
-        <input type="text" id="cajaTitulo" placeholder="Título">
-        <textarea id="cajaContenido" placeholder="Escribe tu nota aquí..."></textarea>
-        <button onclick="guardarNota()">💾 Guardar Cambios</button>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">Mis Notas</h1>
+            </div>
+            <nav class="sidebar-content">
+                <div class="folder-item active">Todo (Web)</div>
+                <div class="folder-item">Notas Clases</div>
+                <div class="folder-item">Proyectos</div>
+                <div class="folder-item">Personal</div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="btn-new-folder">+ Nueva Carpeta</div>
+            </div>
+        </aside>
+
+        <section class="note-list">
+            <div class="note-list-header">
+                <h2 class="note-list-title">Notas Recientes</h2>
+                <span style="color:#009688; cursor:pointer; font-size:20px;">+</span>
+            </div>
+            <div class="note-list-content">
+                <div class="note-item active">
+                    <h3 class="note-item-title" id="tituloLista">Espacio Compartido</h3>
+                    <p class="note-item-snippet" id="snippetLista">Ingresa la contraseña para acceder...</p>
+                </div>
+                <div class="note-item">
+                    <h3 class="note-item-title">Idea de Negocio</h3>
+                    <p class="note-item-snippet">Revisar los modelos de suscripción...</p>
+                </div>
+                <div class="note-item">
+                    <h3 class="note-item-title">Lista de compras</h3>
+                    <p class="note-item-snippet">Manzanas, Leche, Pan, Café, ...</p>
+                </div>
+            </div>
+        </section>
+
+        <main class="editor-zone">
+            <header class="editor-header">
+                <span style="color:#8e8e93; font-size:15px;">Sincronizado</span>
+                <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
+            </header>
+            <article class="editor-content">
+                <input type="text" id="cajaTitulo" placeholder="Título de la nota">
+                <textarea id="cajaContenido" placeholder="Comienza a escribir tu nota aquí..."></textarea>
+            </article>
+        </main>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Configuración de Firebase
+        // Configuración real de Firebase (Tus datos)
         var firebaseConfig = {
           apiKey: "AIzaSyDyuqn1K4k6oChD-WpvWCdxGq8N2P9h78Q",
           authDomain: "misnotas2529-83990.firebaseapp.com",
@@ -98,45 +221,67 @@
           appId: "1:457391422873:web:5a1651bcc8cbb6c8f1a708"
         };
 
+        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
 
+        // Enlaces a la interfaz
         var cajaTitulo = document.getElementById('cajaTitulo');
         var cajaContenido = document.getElementById('cajaContenido');
         var notificacion = document.getElementById('notificacion');
+        
+        // Elementos de la lista central (para actualizar el resumen)
+        var tituloLista = document.getElementById('tituloLista');
+        var snippetLista = document.getElementById('snippetLista');
 
+        // Cargar nota al iniciar
         cargarNota();
 
+        // FUNCIONES COMPATIBLES CON IPAD 2 (ES5)
         function cargarNota() {
             cajaTitulo.value = "Cargando...";
             cajaContenido.value = "Cargando...";
 
+            // Leer desde la rama compartida
             database.ref('notas_compartidas/unica').on('value', function(snapshot) {
                 if (snapshot.exists()) {
                     var datos = snapshot.val();
-                    cajaTitulo.value = datos.titulo || "";
-                    cajaContenido.value = datos.contenido || "";
+                    var t = datos.titulo || "";
+                    var c = datos.contenido || "";
+                    
+                    // Actualizar el editor principal
+                    cajaTitulo.value = t;
+                    cajaContenido.value = c;
+                    
+                    // Actualizar la lista central (sincronización visual)
+                    tituloLista.innerText = t;
+                    // Creamos un resumen corto (snippet)
+                    var shortContent = c.substring(0, 60).replace(/\n/g, ' ') + "...";
+                    snippetLista.innerText = shortContent;
                 } else {
                     cajaTitulo.value = "";
                     cajaContenido.value = "";
+                    tituloLista.innerText = "Nueva Nota";
+                    snippetLista.innerText = "Sin contenido...";
                 }
             });
         }
 
-        // Función para mostrar el aviso flotante y ocultarlo después de 2 segundos
+        // Función Toast para el "Check" de guardado
         function mostrarCheck() {
             notificacion.style.display = "block";
             setTimeout(function() {
                 notificacion.style.display = "none";
-            }, 2000); // 2000 milisegundos = 2 segundos
+            }, 2000); // 2 segundos
         }
 
         function guardarNota() {
+            // Guardar en la rama compartida
             database.ref('notas_compartidas/unica').set({
                 titulo: cajaTitulo.value,
                 contenido: cajaContenido.value
             }).then(function() {
-                // Aquí quitamos el alert() y llamamos al nuevo diseño
+                // Mostrar el check visual (Toast) en lugar de alert()
                 mostrarCheck();
             }).catch(function(error) {
                 alert("Hubo un error al guardar: " + error);
