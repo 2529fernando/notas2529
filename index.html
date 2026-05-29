@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mis Notas y Archivos Cloud</title>
     <style>
+        /* --- Evita que los elementos se salgan de la pantalla --- */
         * { box-sizing: border-box; }
 
         body, html {
@@ -22,6 +23,7 @@
             font-size: 16px; font-weight: bold; z-index: 4000;
         }
 
+        /* Capa oscura para móviles */
         #overlay {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: rgba(0,0,0,0.5);
@@ -84,25 +86,7 @@
             flex-grow: 1; -webkit-flex-grow: 1; 
             margin-right: 20px; font-family: inherit; min-width: 0; 
         }
-
-        /* Contenedor para agrupar los botones de la derecha */
-        .header-buttons {
-            display: flex; display: -webkit-flex; align-items: center;
-        }
         
-        /* Botón Naranja de Adjuntar */
-        .btn-subir-archivo {
-            background-color: #FF9800; /* Color naranja */
-            color: white; padding: 10px 20px;
-            border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 15px;
-            display: inline-block; text-align: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: background 0.2s;
-            margin-right: 10px; /* Separación con el botón guardar */
-            white-space: nowrap;
-        }
-        .btn-subir-archivo:hover { background-color: #F57C00; }
-        
-        /* Botón Verde de Guardar */
         .btn-save {
             padding: 10px 25px; border: none; border-radius: 20px;
             color: white; background-color: #009688;
@@ -122,17 +106,21 @@
             font-size: 19px; line-height: 1.6; color: #333; font-family: inherit;
         }
 
+        .btn-subir-archivo {
+            background-color: #009688; color: white; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 15px;
+            display: inline-block; margin-bottom: 20px; text-align: center; width: 170px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: background 0.2s;
+        }
+        .btn-subir-archivo:hover { background-color: #00796B; }
+
         /* --- DISEÑO MÓVIL --- */
         @media (max-width: 768px) {
             .btn-menu { display: block; }
             .editor-zone { width: 100%; }
             .editor-header { padding: 15px 20px; }
-            #cajaTitulo { font-size: 20px; margin-right: 10px; }
-            
-            /* Ajustamos los botones para que entren en celulares */
-            .btn-subir-archivo { padding: 10px 12px; font-size: 14px; margin-right: 5px; }
+            #cajaTitulo { font-size: 22px; }
             .btn-save { padding: 10px 15px; font-size: 14px; }
-            
             .editor-content { padding: 20px; }
             
             .sidebar {
@@ -147,6 +135,7 @@
 <body>
 
     <div id="notificacion">✅ ¡Guardado!</div>
+    
     <div id="overlay"></div>
 
     <div class="app-wrapper">
@@ -166,16 +155,13 @@
             <header class="editor-header">
                 <button id="btnMenu" class="btn-menu">☰</button>
                 <input type="text" id="cajaTitulo" placeholder="Título de la nota">
-                
-                <div class="header-buttons">
-                    <label for="inputArchivo" class="btn-subir-archivo">📎 Adjuntar</label>
-                    <input type="file" id="inputArchivo" style="display: none;">
-                    
-                    <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
-                </div>
+                <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
             </header>
             
             <article class="editor-content">
+                <label for="inputArchivo" class="btn-subir-archivo">📎 Adjuntar Archivo</label>
+                <input type="file" id="inputArchivo" style="display: none;">
+                
                 <textarea id="cajaContenido" placeholder="Comienza a escribir tu nota aquí..."></textarea>
             </article>
         </main>
@@ -204,6 +190,7 @@
         var inputArchivo = document.getElementById('inputArchivo');
         var listaArchivos = document.getElementById('listaArchivos');
         
+        // Elementos del menú móvil
         var btnMenu = document.getElementById('btnMenu');
         var sidebar = document.getElementById('sidebar');
         var overlay = document.getElementById('overlay');
@@ -220,6 +207,7 @@
         
         overlay.onclick = cerrarMenu;
 
+        // 1. Cargar el texto de la nota
         database.ref('notas_compartidas/unica').on('value', function(snapshot) {
             if (snapshot.exists()) {
                 var datos = snapshot.val();
@@ -228,21 +216,45 @@
             }
         });
 
+        // 2. Cargar y escuchar la lista de archivos (con botón de eliminar)
         database.ref('notas_compartidas/archivos').on('value', function(snapshot) {
             listaArchivos.innerHTML = ""; 
             
             if (snapshot.exists()) {
                 snapshot.forEach(function(childSnapshot) {
                     var archivo = childSnapshot.val();
+                    var keyArchivo = childSnapshot.key;
+                    
                     var divElement = document.createElement('div');
                     divElement.className = "folder-item";
-                    divElement.innerText = "📄 " + archivo.nombre;
+                    divElement.style.display = "flex";
+                    divElement.style.justifyContent = "space-between";
+                    divElement.style.alignItems = "center";
                     
-                    divElement.onclick = function() {
+                    var spanText = document.createElement('span');
+                    spanText.innerText = "📄 " + archivo.nombre;
+                    spanText.style.overflow = "hidden";
+                    spanText.style.textOverflow = "ellipsis";
+                    spanText.style.whiteSpace = "nowrap";
+                    spanText.style.flexGrow = "1";
+                    spanText.onclick = function() {
                         window.open(archivo.url, '_blank');
                         cerrarMenu(); 
                     };
                     
+                    var spanBorrar = document.createElement('span');
+                    spanBorrar.innerText = "🗑️";
+                    spanBorrar.style.marginLeft = "10px";
+                    spanBorrar.style.fontSize = "18px";
+                    spanBorrar.onclick = function(e) {
+                        e.stopPropagation(); 
+                        if(confirm("¿Seguro que deseas borrar este archivo para siempre?")) {
+                            borrarArchivoWeb(keyArchivo, archivo.url);
+                        }
+                    };
+                    
+                    divElement.appendChild(spanText);
+                    divElement.appendChild(spanBorrar);
                     listaArchivos.appendChild(divElement);
                 });
             } else {
@@ -250,14 +262,14 @@
             }
         });
 
+        // 3. Subir archivo a cPanel
         inputArchivo.addEventListener('change', function(e) {
             var file = e.target.files[0];
             if (!file) return;
 
             var boton = document.querySelector('.btn-subir-archivo');
             boton.innerText = "⏳ Subiendo...";
-            // Oscurecemos el naranja mientras sube
-            boton.style.backgroundColor = "#F57C00"; 
+            boton.style.backgroundColor = "#00796B";
 
             var formData = new FormData();
             formData.append("archivo", file); 
@@ -266,9 +278,8 @@
             xhr.open("POST", "https://sebastech.website/subir_archivo.php", true);
             
             xhr.onload = function() {
-                boton.innerText = "📎 Adjuntar";
-                // Devolvemos al naranja original
-                boton.style.backgroundColor = "#FF9800";
+                boton.innerText = "📎 Adjuntar Archivo";
+                boton.style.backgroundColor = "#009688";
 
                 if (xhr.status === 200) {
                     try {
@@ -293,6 +304,21 @@
             xhr.send(formData);
         });
 
+        // 4. Borrar archivo de cPanel y Firebase
+        function borrarArchivoWeb(key, urlArchivo) {
+            var formData = new FormData();
+            formData.append("url", urlArchivo);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://sebastech.website/borrar_archivo.php", true);
+            xhr.onload = function() {
+                database.ref('notas_compartidas/archivos').child(key).remove();
+                mostrarMensaje("🗑️ ¡Archivo Eliminado!");
+            };
+            xhr.send(formData);
+        }
+
+        // 5. Guardar texto de la nota
         function guardarNota() {
             database.ref('notas_compartidas/unica').set({
                 titulo: cajaTitulo.value,
