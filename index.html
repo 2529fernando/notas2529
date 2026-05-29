@@ -25,6 +25,7 @@
             height: 100%; width: 100%;
         }
 
+        /* --- BARRA LATERAL --- */
         .sidebar {
             width: 260px; flex-shrink: 0; -webkit-flex-shrink: 0;
             background-color: #eaebed; border-right: 1px solid #d1d1d6;
@@ -47,11 +48,13 @@
             color: #8e8e93; font-weight: bold; text-transform: uppercase;
         }
 
+        /* --- ÁREA DE EDICIÓN --- */
         .editor-zone {
             flex-grow: 1; -webkit-flex-grow: 1; background-color: white;
             display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
         }
         
+        /* Barra superior */
         .editor-header {
             padding: 15px 30px; border-bottom: 1px solid #e0e0e0;
             display: flex; display: -webkit-flex; justify-content: space-between; align-items: center;
@@ -62,6 +65,25 @@
             flex-grow: 1; -webkit-flex-grow: 1; margin-right: 20px; font-family: inherit;
         }
         
+        /* Contenedor para agrupar los botones a la derecha */
+        .header-buttons {
+            display: flex; display: -webkit-flex;
+            align-items: center; -webkit-align-items: center;
+        }
+
+        /* BOTÓN NARANJA DE ADJUNTAR */
+        .btn-subir-archivo {
+            background-color: #FF9800; /* Color Naranja */
+            color: white; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 15px;
+            display: inline-block; text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: background 0.2s;
+            margin-right: 15px; /* Separación con el botón de guardar */
+            white-space: nowrap;
+        }
+        .btn-subir-archivo:hover { background-color: #F57C00; /* Naranja más oscuro al pasar el mouse */ }
+
+        /* BOTÓN DE GUARDAR */
         .btn-save {
             padding: 10px 25px; border: none; border-radius: 20px;
             color: white; background-color: #009688;
@@ -70,6 +92,7 @@
         }
         .btn-save:hover { background-color: #00796B; }
 
+        /* Contenido del papel */
         .editor-content {
             flex-grow: 1; -webkit-flex-grow: 1; padding: 30px;
             display: flex; display: -webkit-flex; flex-direction: column; -webkit-flex-direction: column;
@@ -80,14 +103,6 @@
             border: none; outline: none; resize: none;
             font-size: 19px; line-height: 1.6; color: #333; font-family: inherit;
         }
-
-        .btn-subir-archivo {
-            background-color: #009688; color: white; padding: 10px 20px;
-            border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 15px;
-            display: inline-block; margin-bottom: 20px; text-align: center; width: 170px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: background 0.2s;
-        }
-        .btn-subir-archivo:hover { background-color: #00796B; }
     </style>
 </head>
 <body>
@@ -111,13 +126,16 @@
         <main class="editor-zone">
             <header class="editor-header">
                 <input type="text" id="cajaTitulo" placeholder="Título de la nota">
-                <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
+                
+                <div class="header-buttons">
+                    <label for="inputArchivo" class="btn-subir-archivo">📎 Adjuntar Archivo</label>
+                    <input type="file" id="inputArchivo" style="display: none;">
+                    
+                    <button class="btn-save" onclick="guardarNota()">💾 Guardar</button>
+                </div>
             </header>
             
             <article class="editor-content">
-                <label for="inputArchivo" class="btn-subir-archivo">📎 Adjuntar Archivo</label>
-                <input type="file" id="inputArchivo" style="display: none;">
-                
                 <textarea id="cajaContenido" placeholder="Comienza a escribir tu nota aquí..."></textarea>
             </article>
         </main>
@@ -146,7 +164,7 @@
         var inputArchivo = document.getElementById('inputArchivo');
         var listaArchivos = document.getElementById('listaArchivos');
 
-        // 1. Cargar el texto de la nota principal
+        // 1. Cargar el texto de la nota
         database.ref('notas_compartidas/unica').on('value', function(snapshot) {
             if (snapshot.exists()) {
                 var datos = snapshot.val();
@@ -155,20 +173,17 @@
             }
         });
 
-        // 2. Cargar y escuchar la lista de archivos en la barra lateral
+        // 2. Cargar lista de archivos
         database.ref('notas_compartidas/archivos').on('value', function(snapshot) {
-            listaArchivos.innerHTML = ""; // Limpiamos la lista para redibujarla
+            listaArchivos.innerHTML = ""; 
             
             if (snapshot.exists()) {
                 snapshot.forEach(function(childSnapshot) {
                     var archivo = childSnapshot.val();
-                    
-                    // Creamos el botón en el menú lateral
                     var divElement = document.createElement('div');
                     divElement.className = "folder-item";
                     divElement.innerText = "📄 " + archivo.nombre;
                     
-                    // Al hacer clic, abre el archivo en una pestaña nueva
                     divElement.onclick = function() {
                         window.open(archivo.url, '_blank');
                     };
@@ -180,30 +195,29 @@
             }
         });
 
-        // 3. Subir cualquier archivo al cPanel y guardarlo en Firebase
+        // 3. Subir archivo al cPanel
         inputArchivo.addEventListener('change', function(e) {
             var file = e.target.files[0];
             if (!file) return;
 
             var boton = document.querySelector('.btn-subir-archivo');
             boton.innerText = "⏳ Subiendo...";
-            boton.style.backgroundColor = "#00796B";
+            boton.style.backgroundColor = "#F57C00"; // Naranja oscuro mientras sube
 
             var formData = new FormData();
-            formData.append("archivo", file); // Coincide con el PHP
+            formData.append("archivo", file); 
 
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "https://sebastech.website/subir_archivo.php", true);
             
             xhr.onload = function() {
                 boton.innerText = "📎 Adjuntar Archivo";
-                boton.style.backgroundColor = "#009688";
+                boton.style.backgroundColor = "#FF9800"; // Vuelve al naranja normal
 
                 if (xhr.status === 200) {
                     try {
                         var respuesta = JSON.parse(xhr.responseText);
                         if (respuesta.exito) {
-                            // Se subió a cPanel con éxito. Ahora guardamos el enlace en Firebase
                             database.ref('notas_compartidas/archivos').push({
                                 nombre: file.name,
                                 url: respuesta.url
@@ -234,7 +248,6 @@
             });
         }
 
-        // Función general para mostrar avisos
         function mostrarMensaje(texto) {
             notificacion.innerText = texto;
             notificacion.style.display = "block";
